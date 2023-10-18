@@ -1,0 +1,58 @@
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
+import { ModuleType } from '../../../enums/module-type.enum';
+import { PermissionType } from '../../../enums/permission-type.enum';
+
+export type ModulePermissionsDocument = ModulePermissions & Document;
+@Schema()
+export class ModulePermissions {
+  @Prop({
+    type: String,
+    enum: Object.values(ModuleType),
+    required: true
+  })
+  module: ModuleType;
+
+  @Prop({
+    type: Array,
+    enum: Object.values(PermissionType),
+    required: true,
+  })
+  permissions: PermissionType[];  
+
+}
+
+const ModulePermissionsSchema = SchemaFactory.createForClass(ModulePermissions);
+
+export type PermissionDocument = Permission & Document;
+
+@Schema()
+export class Permission {
+  @Prop({ index: true })
+  permission_id: string;
+
+  @Prop({required: true})
+  role_id: string;
+
+  @Prop({
+    type: [ModulePermissionsSchema],
+  })
+  module_permissions: ModulePermissionsDocument[];
+
+  @Prop({ required: true })
+  created_at: string;
+
+  @Prop({ required: true })
+  created_by: string;
+
+  @Prop()
+  updated_at: string;
+
+  @Prop()
+  updated_by: string;
+
+  @Prop({ default: 1 })
+  status?: number;
+}
+
+export const PermissionSchema = SchemaFactory.createForClass(Permission);
